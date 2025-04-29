@@ -8,7 +8,14 @@ from langchain.chat_models import ChatOpenAI
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import fitz
 load_dotenv()
-llm = ChatOpenAI(openai_api_key=os.getenv("OPENAI_API_KEY"), model="gpt-3.5-turbo")
+
+# Check and load OpenAI API key
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    st.error("🚫 Missing OpenAI API key. Please set it in your `.env` or Streamlit secrets.")
+    st.stop()
+
+llm = ChatOpenAI(openai_api_key=api_key, model="gpt-3.5-turbo")
 
 # Function to read uploaded file
 def read_file(uploaded_file):
@@ -87,10 +94,9 @@ if uploaded_file:
                 st.chat_message("user").markdown(query)
                 st.session_state.messages.append({"role": "user", "content": query})
 
-                with st.spinner("Thinking..."):
+                with st.spinner("🧠 Brainwave is thinking..."):
                     response = qa_chain.run(query)
-
-                st.chat_message("assistant").markdown(response)
+                st.chat_message("assistant").markdown(f"✨ {response}")
                 st.session_state.messages.append({"role": "assistant", "content": response})
 
         else:
