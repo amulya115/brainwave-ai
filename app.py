@@ -10,6 +10,7 @@ import fitz
 load_dotenv()
 llm = ChatOpenAI(openai_api_key=os.getenv("OPENAI_API_KEY"), model="gpt-3.5-turbo")
 
+# Function to read uploaded file
 def read_file(uploaded_file):
     if uploaded_file.name.endswith(".txt"):
         return uploaded_file.read().decode("utf-8")
@@ -18,9 +19,15 @@ def read_file(uploaded_file):
         text = ""
         for page in pdf_doc:
             text += page.get_text()
+
+        if not text.strip():
+            st.error("⚠️ Your uploaded PDF has no readable text. Please upload a different file.")
+            st.stop()
+
         return text
     else:
-        return None
+        st.error("❌ Unsupported file type. Please upload a .txt or .pdf file.")
+        st.stop()
 
 def create_vectorstore(text):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
